@@ -18,8 +18,7 @@ module "ec2_instance" {
   name               = each.value.name
   ami                = data.aws_ami.windows.id
   ignore_ami_changes = true
-  instance_type      = var.instance_type
-  //availability_zone = each.value.availability_zone
+  instance_type      = local.instance_type
   key_name                    = local.key_name
   subnet_id                   = each.value.subnet
   vpc_security_group_ids      = [module.security_group.security_group_id]
@@ -27,8 +26,6 @@ module "ec2_instance" {
   iam_instance_profile        = local.iam_instance_profile
   disable_api_stop            = false
   disable_api_termination     = true
-  hibernation                 = true
-  user_data_base64            = base64encode(templatefile("../../../modules/application/init.ps1", local.userdata_vars))
   user_data_replace_on_change = false
 
   monitoring         = true
@@ -52,8 +49,6 @@ module "ec2_instance" {
 
   volume_tags = local.required_tags
   tags = merge(
-    { patch = "thursday" },
-    { AWSBackupPlan = "${var.awsbackupplan}" },
-    { MonitoringEnabled = "True" },
+    { Monitoring = "True" },
     local.required_tags)
 }
